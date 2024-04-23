@@ -30,7 +30,7 @@ trait Notifier
         return $template->save();
     }
 
-    private static function getMessage($key, $lang, $channel): NotificationTemplate|null
+    public static function getMessage($key, $lang, $channel): NotificationTemplate|null
     {
         $query = NotificationTemplate::where("model", self::class)
             ->where("key", $key)
@@ -55,7 +55,7 @@ trait Notifier
     public function getMessageText($key, $lang, $channel): string
     {
         $template = self::getMessage($key, $lang, $channel);
-        return $template->template;
+//        return $template->template;
         return $this->replaceVariables($template->template, $key, $lang, $channel);
     }
 
@@ -74,16 +74,7 @@ trait Notifier
         return $this->getFileObject();
     }
 
-    private function getFilePath(): string
-    {
-        return "";
-    }
-
-    private function getFileObject()
-    {
-    }
-
-    private function replaceVariables($text, $key, $lang, $channel): string
+    public function replaceVariables($text, $key, $lang, $channel): string
     {
         $starter = self::getVariableStarter();
         $ender = self::getVariableEnder();
@@ -91,11 +82,11 @@ trait Notifier
         $variable = $this->getNextVariable($text);
 
         while (filled($variable)) {
-            if (self::isFileVariable($variable)) {
-                $text = Str::replace($starter.$variable.$ender, $this->getFile($key, $lang, $channel), $text);
-            } else {
-                $text = Str::replace($starter.$variable.$ender, $this->$variable, $text);
-            }
+            $text = Str::replace(
+                $starter.$variable.$ender,
+                $this->getVariableValue($variable, $key, $lang, $channel),
+                $text
+            );
 
             $variable = $this->getNextVariable($text);
         }
@@ -103,24 +94,31 @@ trait Notifier
         return $text;
     }
 
-    private function getNextVariable($text): string|null
+    public function getNextVariable($text): string|null
     {
         $starter = self::getVariableStarter();
         $ender = self::getVariableEnder();
 
         $variable = Str::betweenFirst($text, $starter, $ender);
 
-        if ($variable == $text) {
-            $variable = null;
+        if (Str::length($variable) === Str::length($text)) {
+            return null;
         }
 
         return $variable;
     }
 
-    private function isFileVariable($variable)
+    public function getVariableValue($variable, $key, $lang, $channel): string
     {
-        $file_variables = [];
+        if (self::isFileVariable($variable)) {
+            return $this->getFile($key, $lang, $channel);
+        }
 
+        return $this->{$variable};
+    }
+
+    public function isFileVariable($variable)
+    {
         if (filled($this->file_variables)) {
             $file_variables = $this->file_variables;
         } else {
@@ -130,12 +128,12 @@ trait Notifier
         return in_array($variable, $file_variables);
     }
 
-    private static function getVariableStarter(): string
+    public static function getVariableStarter(): string
     {
         return config("model-notification.variable_starter", "[");
     }
 
-    private static function getVariableEnder(): string
+    public static function getVariableEnder(): string
     {
         return config("model-notification.variable_ender", "]");
     }
