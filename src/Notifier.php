@@ -7,10 +7,10 @@ use Illuminate\Support\Str;
 
 trait Notifier
 {
-    public static function addMessage($key, $lang, $channel, $text, bool $with_file = false): bool
+    public static function makeTemplateMessage(): TemplateMessage
     {
-        $template = new NotificationTemplate;
-        return self::updateMessage($template, $key, $lang, $channel, $text, $with_file);
+        logger(1);
+        return TemplateMessage::make()->model(self::class);
     }
 
     public static function updateMessage(
@@ -47,7 +47,7 @@ trait Notifier
         return $template;
     }
 
-    public function getMessages()
+    public static function getMessages()
     {
         return NotificationTemplate::where("model", self::class)->get();
     }
@@ -55,7 +55,6 @@ trait Notifier
     public function getMessageText($key, $lang, $channel): string
     {
         $template = self::getMessage($key, $lang, $channel);
-//        return $template->template;
         return $this->replaceVariables($template->template, $key, $lang, $channel);
     }
 

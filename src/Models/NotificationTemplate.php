@@ -2,6 +2,7 @@
 
 namespace Abather\ModelNotification\Models;
 
+use Abather\ModelNotification\Exceptions\DuplicatedTemplateException;
 use App\Enums\ActivityStatuses;
 use App\Models\Activity;
 use Illuminate\Database\Eloquent\Model;
@@ -20,8 +21,20 @@ class NotificationTemplate extends Model
 
     protected static function booted()
     {
-//        static::creating(function (NotificationTemplate $template) {
-//            //through an error if it is already exists
-//        });
+        static::creating(function (NotificationTemplate $template) {
+            throw_if(
+                self::templateExists($template->model, $template->key, $template->lang, $template->channel),
+                new DuplicatedTemplateException
+            );
+        });
+    }
+
+    public static function templateExists($model, $key, $lang, $channel): bool
+    {
+        return self::where("model", $model)
+            ->where("key", $key)
+            ->where("lang", $lang)
+            ->where("channel", $channel)
+            ->exists();
     }
 }

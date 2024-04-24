@@ -3,10 +3,11 @@
 namespace Abather\ModelNotification\Contracts;
 
 use Abather\ModelNotification\Models\NotificationTemplate;
+use Abather\ModelNotification\TemplateMessage;
 
 interface Notifier
 {
-    public static function addMessage($key, $lang, $channel, $text, bool $with_file = false): bool;
+    public static function makeTemplateMessage(): TemplateMessage;
 
     public static function updateMessage(
         NotificationTemplate $template,
@@ -19,7 +20,7 @@ interface Notifier
 
     public static function getMessage($key, $lang, $channel): NotificationTemplate|null;
 
-    public function getMessages();
+    public static function getMessages();
 
     public function getMessageText($key, $lang, $channel): string;
 

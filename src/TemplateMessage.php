@@ -1,0 +1,145 @@
+<?php
+
+namespace Abather\ModelNotification;
+
+use Abather\ModelNotification\Exceptions\DataMissingException;
+use Abather\ModelNotification\Exceptions\DuplicatedTemplateException;
+use Abather\ModelNotification\Models\NotificationTemplate;
+
+class TemplateMessage
+{
+    private NotificationTemplate $templateMessage;
+    private $model;
+    private $key;
+    private $channel;
+    private $text;
+    private $lang;
+    private $with_file;
+
+    private $required = [
+        "model",
+        "key",
+        "channel",
+        "text",
+        "lang",
+    ];
+
+    public function __construct(NotificationTemplate|string|int|null $templateMessage = null)
+    {
+        $this->templateMessage = $this->setObject($templateMessage);
+    }
+
+    public function setObject(NotificationTemplate|string|int|null $templateMessage): NotificationTemplate
+    {
+        if (filled($templateMessage)) {
+            if ($templateMessage instanceof NotificationTemplate) {
+                return $templateMessage;
+            }
+
+            $templateMessage = NotificationTemplate::find($templateMessage);
+
+            if (filled($templateMessage)) {
+                return $templateMessage;
+            }
+        }
+
+        return new NotificationTemplate;
+    }
+
+    public function key($key): self
+    {
+        $this->key = $key;
+        return $this;
+    }
+
+    public function model($model): self
+    {
+        $this->model = $model;
+        return $this;
+    }
+
+    public function lang($lang): self
+    {
+        $this->lang = $lang;
+        return $this;
+    }
+
+    public function template($text): self
+    {
+        $this->text = $text;
+        return $this;
+    }
+
+    public function channel($channel): self
+    {
+        $this->channel = $channel;
+        return $this;
+    }
+
+    public function includeFile($with_file = true): self
+    {
+        $this->with_file = $with_file;
+        return $this;
+    }
+
+    public function save(): NotificationTemplate
+    {
+        $this->validate();
+        $this->templateMessage->model = $this->model;
+        $this->templateMessage->template = $this->text;
+        $this->templateMessage->channel = $this->channel;
+        $this->templateMessage->key = $this->key;
+        $this->templateMessage->lang = $this->lang;
+        $this->templateMessage->with_file = $this->with_file ?? false;
+        $this->templateMessage->save();
+        $this->templateMessage->refresh();
+        return $this->templateMessage;
+    }
+
+    public function update(): NotificationTemplate
+    {
+        if (filled($this->text)) {
+            $this->templateMessage->template = $this->text;
+        }
+
+        if (filled($this->with_file)) {
+            $this->templateMessage->with_file = $this->with_file;
+        }
+
+        $this->templateMessage->save();
+        $this->templateMessage->refresh();
+        return $this->templateMessage;
+    }
+
+    public function validate(): void
+    {
+        throw_if($this->templateExists(), new DuplicatedTemplateException);
+        throw_unless($this->completeData(), new DataMissingException());
+    }
+
+    public function completeData(): bool
+    {
+        foreach ($this->required as $var) {
+            if (blank($this->{$var})) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function templateDoesNotExists(): bool
+    {
+        return !$this->templateExists();
+    }
+
+    public function templateExists(): bool
+    {
+        return NotificationTemplate::templateExists($this->model, $this->key, $this->lang, $this->channel);
+    }
+
+    public static function make(...$arguments): self
+    {
+        return new static();
+    }
+}
