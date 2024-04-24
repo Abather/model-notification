@@ -12,7 +12,7 @@ trait Notifier
         return TemplateMessage::make(...$arguments)->model(self::class);
     }
 
-    public static function getMessage($key, $lang, $channel): NotificationTemplate|null
+    public static function getTemplateMessage($key, $lang, $channel): NotificationTemplate|null
     {
         $query = self::notificationTemplates()
             ->forKey($key)
@@ -29,7 +29,7 @@ trait Notifier
         return $template;
     }
 
-    public static function getMessages()
+    public static function getTemplateMessages()
     {
         return self::notificationTemplates()->get();
     }
@@ -39,15 +39,20 @@ trait Notifier
         return NotificationTemplate::forModel(self::class);
     }
 
-    public function getMessageText($key, $lang, $channel): string
+    public function getTemplateMessageText($key, $lang, $channel): string
     {
-        $template = self::getMessage($key, $lang, $channel);
+        $template = self::getTemplateMessage($key, $lang, $channel);
+
+        if (blank($template)) {
+            return "";
+        }
+
         return $this->replaceVariables($template->template, $key, $lang, $channel);
     }
 
     public function getFile($key, $lang, $channel, $file_path = true): string|null
     {
-        $template = self::getMessage($key, $lang, $channel);
+        $template = self::getTemplateMessage($key, $lang, $channel);
 
         if (!$template->with_file) {
             return null;
