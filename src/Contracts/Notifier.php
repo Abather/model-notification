@@ -9,11 +9,13 @@ interface Notifier
 {
     public static function makeTemplateMessage(...$arguments): TemplateMessage;
 
-    public static function getMessage($key, $lang, $channel): NotificationTemplate|null;
+    public static function notificationTemplates();
 
-    public static function getMessages();
+    public static function getTemplateMessage($key, $lang, $channel): NotificationTemplate|null;
 
-    public function getMessageText($key, $lang, $channel): string;
+    public static function getTemplateMessages();
+
+    public function getTemplateMessageText($key, $lang, $channel): string;
 
     public function getFile($key, $lang, $channel, $file_path = true): string|null;
 
