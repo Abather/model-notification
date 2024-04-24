@@ -132,10 +132,10 @@ trait Notifier
         return $this->{$variable};
     }
 
-    public function isFileVariable($variable)
+    public static function isFileVariable($variable): bool
     {
-        if (filled($this->file_variables)) {
-            $file_variables = $this->file_variables;
+        if (isset(static::$file_variables)) {
+            $file_variables = static::$file_variables;
         } else {
             $file_variables = config("model-notification.file_variables");
         }

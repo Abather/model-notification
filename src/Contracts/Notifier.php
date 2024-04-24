@@ -32,7 +32,7 @@ interface Notifier
 
     public function getVariableValue($variable, $key, $lang, $channel): string;
 
-    public function isFileVariable($variable);
+    public static function isFileVariable($variable): bool;
 
     public static function getVariableStarter(): string;
 

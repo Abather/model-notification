@@ -89,7 +89,7 @@ class TemplateMessage
         return $this;
     }
 
-    public function prob($prob): self
+    public function prob(array $prob): self
     {
         $this->prob = $prob;
         return $this;

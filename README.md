@@ -1,19 +1,10 @@
 # Add notifications Template into Models
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/abather/model-notification.svg?style=flat-square)](https://packagist.org/packages/abather/model-notification)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/abather/model-notification/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/abather/model-notification/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/abather/model-notification/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/abather/model-notification/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/abather/model-notification.svg?style=flat-square)](https://packagist.org/packages/abather/model-notification)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/model-notification.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/model-notification)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+This package helps you organized and save template messages for each model that included it. each message depends
+upon `key`, `language`, and `channel`.
 
 ## Installation
 
@@ -40,21 +31,86 @@ This is the contents of the published config file:
 
 ```php
 return [
+    "fallback_lang" => env("MODEL_NOTIFICATION_FALLBACK_LANG", "ar"),
+
+    "variable_starter" => "[",
+    "variable_ender" => "]",
+
+    "prevent_including_file" => false,
+
+    "file_variables" => [
+        "file",
+        "file_path",
+        "attachment"
+    ]
 ];
 ```
 
-Optionally, you can publish the views using
+### Override Global Configuration:
 
-```bash
-php artisan vendor:publish --tag="model-notification-views"
+you can prevent including files for specific models if you wish to by adding variable `prevent_including_file` in the
+model:
+
+```php
+public static $prevent_including_file = true;
+```
+
+if you went to use specific file variables for the model you can add `file_variables` variable:
+
+```php
+public static $file_variables = ["document"];
 ```
 
 ## Usage
 
+you can use this package with any `Model` you have to implement `Notifier` interface and use `Notifier` trait:
+
 ```php
-$modelNotification = new Abather\ModelNotification();
-echo $modelNotification->echoPhrase('Hello, Abather!');
+namespace App\Models;
+
+use Abather\ModelNotification\Contracts\Notifier;
+use Illuminate\Database\Eloquent\Model;
+
+class Bill extends Model implements Notifier
+{
+    use \Abather\ModelNotification\Notifier;
+}
 ```
+
+now you can create, call, or update message templates as well be descriped.
+
+### Create new template for a model:
+
+to create new template for any model you can use `makeTemplateMessage()` method you have to
+specify `key`, `lang`, `channel` and `template`:
+
+```php
+Bill::makeTemplateMessage()
+    ->key("new")
+    ->channel("sms")
+    ->lang("ar")
+    ->template("You Have new Bill [id], amount are: [amount] [created_at]")
+    ->save();
+```
+
+`template()` can have any attribute that present in the model the attribute value well be replace the attribute, also
+you can include file url into the template by adding any key that defined in the `config("
+model-notification.file_variables")` or that defined in the model `$file_variables` as array.
+
+if you went to include file with the message you can use `includeFile()` method:
+
+```php
+Bill::makeTemplateMessage()
+    ->key("new")
+    ->channel("sms")
+    ->lang("ar")
+    ->template("You Have new Bill [id], amount are: [amount] [created_at]")
+    ->includeFile()
+    ->save();
+```
+
+also you can pass any extra data to `prob([$key => $value])` each value well ge through the same process as template to
+replace the attributes with data.
 
 ## Testing
 
