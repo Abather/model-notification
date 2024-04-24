@@ -3,6 +3,7 @@
 namespace Abather\ModelNotification;
 
 use Abather\ModelNotification\Models\NotificationTemplate;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 trait Notifier
@@ -14,7 +15,7 @@ trait Notifier
             ->preventIncludingFile(self::preventIncludingFile());
     }
 
-    public static function getTemplateMessage($key, $lang, $channel): NotificationTemplate|null
+    public static function getTemplateMessage($key, $lang, $channel): ?NotificationTemplate
     {
         $query = self::notificationTemplates()
             ->forKey($key)
@@ -52,7 +53,7 @@ trait Notifier
         return $this->replaceVariables($template->template, $key, $lang, $channel);
     }
 
-    public function getFile($key, $lang, $channel, $file_path = true): string|null
+    public function getFile($key, $lang, $channel, $file_path = true): ?string
     {
         $template = self::getTemplateMessage($key, $lang, $channel);
 
@@ -87,7 +88,7 @@ trait Notifier
         return $text;
     }
 
-    public function getNextVariable($text): string|null
+    public function getNextVariable($text): ?string
     {
         $starter = self::getVariableStarter();
         $ender = self::getVariableEnder();
@@ -119,6 +120,16 @@ trait Notifier
         }
 
         return in_array($variable, $file_variables);
+    }
+
+    public function getFilePath(): string
+    {
+        return "";
+    }
+
+    public function getFileObject(): ?File
+    {
+        return null;
     }
 
     public static function getVariableStarter(): string
