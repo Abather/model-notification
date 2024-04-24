@@ -5,6 +5,7 @@ namespace Abather\ModelNotification\Models;
 use Abather\ModelNotification\Exceptions\DuplicatedTemplateException;
 use App\Enums\ActivityStatuses;
 use App\Models\Activity;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class NotificationTemplate extends Model
@@ -27,6 +28,26 @@ class NotificationTemplate extends Model
                 new DuplicatedTemplateException
             );
         });
+    }
+
+    public function scopeForModel(Builder $query, $model): void
+    {
+        $query->where("model", $model);
+    }
+
+    public function scopeForChannel(Builder $query, $channel): void
+    {
+        $query->where("channel", $channel);
+    }
+
+    public function scopeForLang(Builder $query, $lang): void
+    {
+        $query->where("lang", $lang);
+    }
+
+    public function scopeForKey(Builder $query, $key): void
+    {
+        $query->where("key", $key);
     }
 
     public static function templateExists($model, $key, $lang, $channel): bool

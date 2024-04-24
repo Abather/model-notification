@@ -7,40 +7,22 @@ use Illuminate\Support\Str;
 
 trait Notifier
 {
-    public static function makeTemplateMessage(): TemplateMessage
+    public static function makeTemplateMessage(...$arguments): TemplateMessage
     {
-        logger(1);
-        return TemplateMessage::make()->model(self::class);
-    }
-
-    public static function updateMessage(
-        NotificationTemplate $template,
-        $key,
-        $lang,
-        $channel,
-        $text,
-        bool $with_file
-    ): bool {
-        $template->model = self::class;
-        $template->key = $key;
-        $template->lang = $lang;
-        $template->channel = $channel;
-        $template->template = $text;
-        $template->with_file = $with_file;
-        return $template->save();
+        return TemplateMessage::make(...$arguments)->model(self::class);
     }
 
     public static function getMessage($key, $lang, $channel): NotificationTemplate|null
     {
-        $query = NotificationTemplate::where("model", self::class)
-            ->where("key", $key)
-            ->where("channel", $channel);
+        $query = self::notificationTemplates()
+            ->forKey($key)
+            ->forChannel($channel);
 
-        $template = $query->where("lang", $lang)
+        $template = $query->forLang($lang)
             ->first();
 
         if (blank($template)) {
-            $query->where("lang", config("model-notification.fallback_lang"))
+            $query->forLang(config("model-notification.fallback_lang"))
                 ->first();
         }
 
@@ -49,7 +31,12 @@ trait Notifier
 
     public static function getMessages()
     {
-        return NotificationTemplate::where("model", self::class)->get();
+        return self::notificationTemplates()->get();
+    }
+
+    public static function notificationTemplates()
+    {
+        return NotificationTemplate::forModel(self::class);
     }
 
     public function getMessageText($key, $lang, $channel): string

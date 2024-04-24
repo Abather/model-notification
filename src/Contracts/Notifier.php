@@ -7,16 +7,7 @@ use Abather\ModelNotification\TemplateMessage;
 
 interface Notifier
 {
-    public static function makeTemplateMessage(): TemplateMessage;
-
-    public static function updateMessage(
-        NotificationTemplate $template,
-        $key,
-        $lang,
-        $channel,
-        $text,
-        bool $with_file
-    ): bool;
+    public static function makeTemplateMessage(...$arguments): TemplateMessage;
 
     public static function getMessage($key, $lang, $channel): NotificationTemplate|null;
 

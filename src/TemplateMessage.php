@@ -140,6 +140,6 @@ class TemplateMessage
 
     public static function make(...$arguments): self
     {
-        return new static();
+        return new static(...$arguments);
     }
 }
