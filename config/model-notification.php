@@ -6,6 +6,8 @@ return [
     "variable_starter" => "[",
     "variable_ender" => "]",
 
+    "prevent_including_file" => false,
+
     "file_variables" => [
         "file",
         "file_path",

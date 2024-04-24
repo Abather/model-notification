@@ -9,7 +9,9 @@ trait Notifier
 {
     public static function makeTemplateMessage(...$arguments): TemplateMessage
     {
-        return TemplateMessage::make(...$arguments)->model(self::class);
+        return TemplateMessage::make(...$arguments)
+            ->model(self::class)
+            ->preventIncludingFile(self::preventIncludingFile());
     }
 
     public static function getTemplateMessage($key, $lang, $channel): NotificationTemplate|null
@@ -127,5 +129,16 @@ trait Notifier
     public static function getVariableEnder(): string
     {
         return config("model-notification.variable_ender", "]");
+    }
+
+    public static function preventIncludingFile(): bool
+    {
+        if (isset(static::$prevent_including_file)) {
+            $prevent = static::$prevent_including_file;
+        } else {
+            $prevent = config("model-notification.prevent_including_file");
+        }
+
+        return $prevent;
     }
 }

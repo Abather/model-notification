@@ -15,7 +15,7 @@ class TemplateMessage
     private $text;
     private $lang;
     private $with_file;
-
+    private $prevent_including_file;
     private $required = [
         "model",
         "key",
@@ -78,7 +78,13 @@ class TemplateMessage
 
     public function includeFile($with_file = true): self
     {
-        $this->with_file = $with_file;
+        $this->with_file = $this->prevent_including_file ? false : $with_file;
+        return $this;
+    }
+
+    public function preventIncludingFile($prevent_including_file = true): self
+    {
+        $this->prevent_including_file = $prevent_including_file;
         return $this;
     }
 
