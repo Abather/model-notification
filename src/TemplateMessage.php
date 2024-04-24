@@ -16,6 +16,7 @@ class TemplateMessage
     private $lang;
     private $with_file;
     private $prevent_including_file;
+    private $prob;
     private $required = [
         "model",
         "key",
@@ -88,6 +89,12 @@ class TemplateMessage
         return $this;
     }
 
+    public function prob($prob): self
+    {
+        $this->prob = $prob;
+        return $this;
+    }
+
     public function save(): NotificationTemplate
     {
         $this->validate();
@@ -97,6 +104,8 @@ class TemplateMessage
         $this->templateMessage->key = $this->key;
         $this->templateMessage->lang = $this->lang;
         $this->templateMessage->with_file = $this->with_file ?? false;
+        $this->templateMessage->prob = $this->prob ?? [];
+
         $this->templateMessage->save();
         $this->templateMessage->refresh();
         return $this->templateMessage;
@@ -110,6 +119,10 @@ class TemplateMessage
 
         if (filled($this->with_file)) {
             $this->templateMessage->with_file = $this->with_file;
+        }
+
+        if (filled($this->prob)) {
+            $this->templateMessage->prob = $this->prob;
         }
 
         $this->templateMessage->save();
