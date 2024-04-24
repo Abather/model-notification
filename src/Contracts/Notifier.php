@@ -18,6 +18,8 @@ interface Notifier
 
     public function getTemplateMessageText($key, $lang, $channel): string;
 
+    public function getTemplateMessageProb($key, $lang, $channel): array;
+
     public function getFile($key, $lang, $channel, $file_path = true): ?string;
 
     public function getFilePath(): string;

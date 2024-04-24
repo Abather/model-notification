@@ -104,7 +104,7 @@ class TemplateMessage
         $this->templateMessage->key = $this->key;
         $this->templateMessage->lang = $this->lang;
         $this->templateMessage->with_file = $this->with_file ?? false;
-        $this->templateMessage->prob = $this->prob ?? [];
+        $this->templateMessage->prob = $this->prob ?? null;
 
         $this->templateMessage->save();
         $this->templateMessage->refresh();

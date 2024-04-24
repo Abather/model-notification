@@ -53,6 +53,27 @@ trait Notifier
         return $this->replaceVariables($template->template, $key, $lang, $channel);
     }
 
+    public function getTemplateMessageProb($key, $lang, $channel): array
+    {
+        $template = self::getTemplateMessage($key, $lang, $channel);
+
+        if (blank($template)) {
+            return [];
+        }
+
+        if (blank($template->prob)) {
+            return [];
+        }
+
+        $probs = [];
+
+        foreach ($template->prob as $key => $prob) {
+            $probs[$key] = $this->replaceVariables($prob, $key, $lang, $channel);
+        }
+
+        return $probs;
+    }
+
     public function getFile($key, $lang, $channel, $file_path = true): ?string
     {
         $template = self::getTemplateMessage($key, $lang, $channel);
