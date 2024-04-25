@@ -18,13 +18,13 @@ interface Notifier
 
     public function getTemplateMessageText($key, $lang, $channel): string;
 
-    public function getTemplateMessageProb($key, $lang, $channel): array;
+    public function getTemplateMessageProb($key, $lang, $channel): array|string;
 
     public function getFile($key, $lang, $channel, $file_path = true): ?string;
 
     public function getFilePath(): string;
 
-    public function getFileObject(): ?File;
+    public function getFileObject();
 
     public function replaceVariables($text, $key, $lang, $channel): string;
 

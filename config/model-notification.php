@@ -27,6 +27,13 @@ return [
     "relationship_variable_symbol" => "->",
 
     /**
+     * The file name used to fetch the file URL or file object.
+     * You can override this configuration by setting a variable in each model to specify a different name.
+     * public static $file_name = "attachment";
+     */
+    "file_name" => "file",
+
+    /**
      * If set to true, files will be globally prevented from being included.
      * You can override this configuration by setting a variable in each model where you want it to act differently.
      * public static $prevent_including_file = true;

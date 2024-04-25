@@ -4,6 +4,7 @@ namespace Abather\ModelNotification;
 
 use Abather\ModelNotification\Models\NotificationTemplate;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 trait Notifier
@@ -53,7 +54,7 @@ trait Notifier
         return $this->replaceVariables($template->template, $key, $lang, $channel);
     }
 
-    public function getTemplateMessageProb($key, $lang, $channel): array
+    public function getTemplateMessageProb($key, $lang, $channel, $prob = null): array|string
     {
         $template = self::getTemplateMessage($key, $lang, $channel);
 
@@ -65,10 +66,22 @@ trait Notifier
             return [];
         }
 
+        $template_probs = $template->prob;
+
+        if (filled($prob)) {
+            if (!array_key_exists($prob, $template_probs)) {
+                return "";
+            }
+
+            $template_probs = $template_probs[$prob];
+
+            return $this->replaceVariables($template_probs, $key, $lang, $channel);
+        }
+
         $probs = [];
 
-        foreach ($template->prob as $key => $prob) {
-            $probs[$key] = $this->replaceVariables($prob, $key, $lang, $channel);
+        foreach ($template_probs as $key => $value) {
+            $probs[$key] = $this->replaceVariables($value, $key, $lang, $channel);
         }
 
         return $probs;
@@ -175,12 +188,21 @@ trait Notifier
 
     public function getFilePath(): string
     {
-        return "";
+        return Storage::url($this->getFileName());
     }
 
-    public function getFileObject(): ?File
+    public function getFileObject()
     {
-        return null;
+        return Storage::get($this->getFileName());
+    }
+
+    public function getFileName(): string
+    {
+        if (isset(static::$file_name)) {
+            return static::$file_name;
+        }
+
+        return config("model-notification.file_name");
     }
 
     public static function getVariableStarter(): string
