@@ -129,7 +129,24 @@ trait Notifier
             return $this->getFile($key, $lang, $channel);
         }
 
+        if (self::isRelationshipVariable($variable)) {
+            return $this->getRelationshipValue($variable);
+        }
+
         return $this->{$variable};
+    }
+
+    public static function isRelationshipVariable($variable): bool
+    {
+        if (!Str::contains($variable, self::getRelationVariableSymbol())) {
+            return false;
+        }
+
+        if (Str::startsWith($variable, self::getRelationVariableSymbol())) {
+            return false;
+        }
+
+        return !Str::endsWith($variable, self::getRelationVariableSymbol());
     }
 
     public static function isFileVariable($variable): bool
@@ -141,6 +158,19 @@ trait Notifier
         }
 
         return in_array($variable, $file_variables);
+    }
+
+    public function getRelationshipValue($variable): string
+    {
+        $variable = explode(self::getRelationVariableSymbol(), $variable);
+        $model = array_shift($variable);
+        $attribute = array_shift($variable);
+
+        if (blank($this->{$model})) {
+            return "";
+        }
+
+        return $this->{$model}->{$attribute};
     }
 
     public function getFilePath(): string
@@ -161,6 +191,11 @@ trait Notifier
     public static function getVariableEnder(): string
     {
         return config("model-notification.variable_ender", "]");
+    }
+
+    public static function getRelationVariableSymbol(): string
+    {
+        return config("model-notification.relationship_variable_symbol", "->");
     }
 
     public static function preventIncludingFile(): bool
