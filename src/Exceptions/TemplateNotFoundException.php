@@ -4,7 +4,7 @@ namespace Abather\ModelNotification\Exceptions;
 
 use Throwable;
 
-class DuplicatedTemplateException extends ModelNotificationException
+class TemplateNotFoundException extends ModelNotificationException
 {
     public function __construct(
         string $model,
@@ -14,13 +14,13 @@ class DuplicatedTemplateException extends ModelNotificationException
         ?Throwable $previous = null
     ) {
         $message = sprintf(
-            'Template already exists for model "%s" with key "%s", language "%s", and channel "%s".',
+            'Template not found for model "%s" with key "%s", language "%s", and channel "%s".',
             $model,
             $key,
             $lang,
             $channel
         );
 
-        parent::__construct($message, 409, $previous);
+        parent::__construct($message, 404, $previous);
     }
 }

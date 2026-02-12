@@ -7,6 +7,55 @@ return [
     "fallback_lang" => env("MODEL_NOTIFICATION_FALLBACK_LANG", "ar"),
 
     /**
+     * Cache configuration.
+     */
+    "cache" => [
+        "enabled" => env("MODEL_NOTIFICATION_CACHE_ENABLED", true),
+        "driver" => env("MODEL_NOTIFICATION_CACHE_DRIVER", null), // null = use default cache driver
+        "ttl" => env("MODEL_NOTIFICATION_CACHE_TTL", 86400), // 24 hours
+        "prefix" => env("MODEL_NOTIFICATION_CACHE_PREFIX", "model_notification"),
+        "tags" => [
+            "template" => "template",
+            "model" => "model",
+        ],
+    ],
+
+    /**
+     * Variable configuration.
+     */
+    "variables" => [
+        "starter" => "[",
+        "ender" => "]",
+        "relationship_symbol" => "->",
+        "method_symbol" => "()",
+        "strict_mode" => env("MODEL_NOTIFICATION_STRICT_MODE", false),
+        "allow_method_calls" => env("MODEL_NOTIFICATION_ALLOW_METHOD_CALLS", true),
+        "whitelisted_methods" => ["*"], // or ['fullName', 'formatDate']
+        "fallback_value" => "",
+        "max_depth" => 10,
+    ],
+
+
+    /**
+     * Formatting configuration.
+     */
+    "formatters" => [
+        "currency" => ["symbol" => "$", "decimals" => 2],
+        "date" => ["format" => "Y-m-d H:i:s"],
+        "number" => ["decimals" => 0, "thousands_separator" => ","],
+        "truncate" => ["length" => 100, "suffix" => "..."],
+    ],
+
+    /**
+     * Validation configuration.
+     */
+    "validation" => [
+        "enabled" => env("MODEL_NOTIFICATION_VALIDATION", true),
+        "check_undefined_variables" => false,
+        "max_template_length" => 10000,
+    ],
+
+    /**
      * The symbol that represents the start of a variable name.
      * Avoid using spaces or common symbols for attribute naming, such as "-", "_",
      * as well as symbols commonly used in text, like ".", or ",".

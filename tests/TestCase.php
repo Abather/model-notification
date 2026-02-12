@@ -13,7 +13,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Abather\\ModelNotification\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn(string $modelName) => 'Abather\\ModelNotification\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
@@ -24,13 +24,16 @@ class TestCase extends Orchestra
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
+        config()->set('filesystems.default', 'local');
+        config()->set('filesystems.disks.local.root', storage_path('framework/testing/disks/local'));
+    }
 
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_model-notification_table.php.stub';
-        $migration->up();
-        */
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../workbench/database/migrations');
     }
 }

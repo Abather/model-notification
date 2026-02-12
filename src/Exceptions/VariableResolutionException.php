@@ -4,15 +4,17 @@ namespace Abather\ModelNotification\Exceptions;
 
 use Throwable;
 
-class DataMissingException extends ModelNotificationException
+class VariableResolutionException extends ModelNotificationException
 {
     public function __construct(
-        array $missingFields,
+        string $variable,
+        string $reason,
         ?Throwable $previous = null
     ) {
         $message = sprintf(
-            'Required data missing: %s.',
-            implode(', ', $missingFields)
+            'Variable "%s" cannot be resolved: %s.',
+            $variable,
+            $reason
         );
 
         parent::__construct($message, 422, $previous);
