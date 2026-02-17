@@ -132,19 +132,36 @@ class TemplateMessage
 
     public function validate(): void
     {
-        throw_if($this->templateExists(), new DuplicatedTemplateException);
-        throw_unless($this->completeData(), new DataMissingException());
+        if ($this->templateExists()) {
+            throw new DuplicatedTemplateException(
+                $this->model,
+                $this->key,
+                $this->lang,
+                $this->channel
+            );
+        }
+
+        $missing = $this->getMissingFields();
+        if (!empty($missing)) {
+            throw new DataMissingException($missing);
+        }
+    }
+
+    public function getMissingFields(): array
+    {
+        $missing = [];
+        foreach ($this->required as $var) {
+            if (blank($this->{$var})) {
+                $missing[] = $var;
+            }
+        }
+
+        return $missing;
     }
 
     public function completeData(): bool
     {
-        foreach ($this->required as $var) {
-            if (blank($this->{$var})) {
-                return false;
-            }
-        }
-
-        return true;
+        return empty($this->getMissingFields());
     }
 
     public function templateDoesNotExists(): bool

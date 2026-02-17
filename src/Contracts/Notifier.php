@@ -28,10 +28,6 @@ interface Notifier
 
     public function replaceVariables($text, $key, $lang, $channel): string;
 
-    public function getNextVariable($text): ?string;
-
-    public function getVariableValue($variable, $key, $lang, $channel): string;
-
     public static function isFileVariable($variable): bool;
 
     public static function getVariableStarter(): string;
